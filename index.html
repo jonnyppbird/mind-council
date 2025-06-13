@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mind Council MVP</title>
+	
+<link rel="icon" href="icons/logo-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/logo-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Mind Council">
+	
+	
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+body {
+  background-color: #fdfcfa;
+  font-family: 'Inter', sans-serif;
+  color: #2b2d42;
+  margin: 0;
+  padding: 2rem;
+}
+
+.card {
+  background: white;
+  padding: 1.5rem;
+  margin: 1rem auto;
+  max-width: 500px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.button {
+  display: block;
+   font-family: 'Inter', sans-serif;	
+  width: 100%;
+  margin-top: 1.5rem;
+  padding: 1.2rem;
+  background: #4a90e2;
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.3rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.button:hover {
+  background: #3f7ec4;
+}
+
+textarea {
+  width: 100%;
+  height: 120px;
+  margin-top: 0.5rem;
+  padding: 1rem;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  resize: vertical;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.response {
+  margin-top: 1rem;
+  padding: 1rem 1.2rem;
+  background: #eef4ff;
+  border-radius: 10px;
+  font-size: 1rem;
+  line-height: 1.6;
+  white-space: pre-wrap; /* keeps paragraph spacing */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+
+.section-title {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #1d3557;
+}
+
+.toggle-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.voice-button {
+  flex: 1;
+  font-family: 'Inter', sans-serif;
+  padding: 1rem;
+  background: #c4d7e5;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffffffcc;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.voice-button.active[data-voice="Steve"] {
+  background: #ff7aa2;
+  color: #ffffffcc;
+}
+
+.voice-button.active[data-voice="Theo"] {
+  background: #2acfcf;
+  color: #ffffffcc;
+}
+
+.voice-label {
+  font-size: 1rem;
+  font-weight: 400;
+  color: #ffffffcc;
+}
+
+.app-title {
+  text-align: center;
+  font-size: 2rem;
+  color: #4a90e2;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+
+.session-log {
+  margin-top: 2rem;
+  background: #fafafa;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.04);
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.hide-log {
+  display: block;
+  margin: 1rem auto 0;
+  background: transparent;
+  color: #4a90e2;
+  border: none;
+  font-size: 0.95rem;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+
+.session-log h2 {
+  margin-top: 0;
+  font-size: 1.2rem;
+  color: #333;
+}
+	  
+/* Questionnaire Modal Styles */
+#questionnaireModal {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  padding: 1rem;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.modal-inner {
+  background: white;
+  max-width: 500px;
+  margin: 5vh auto;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.modal-inner h2 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: #1d3557;
+}
+
+.modal-inner label {
+  display: block;
+  font-size: 1rem;
+  margin-bottom: 0.3rem;
+  font-weight: 500;
+}
+
+.modal-inner select {
+  width: 100%;
+  padding: 0.6rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+}
+	  
+.emergency-overlay {
+  position: fixed;
+  z-index: 1000;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #cddafd, #ffffff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  box-sizing: border-box;
+  flex-direction: column;
+}
+
+.emergency-content {
+  background: white;
+  border: 2px solid #4a90e2;	
+  border-radius: 16px;
+  padding: 2rem 1rem;
+  box-shadow: 0 0 20px rgba(0,0,0,0.1);
+  text-align: center;
+  max-width: 90%;
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.emergency-content h2 {
+  font-size: 1.8rem;
+  color: #4a90e2; /* That lovely blue */
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+
+#breathDisplay {
+  margin-bottom: 1.5rem;
+  font-size: 1.3rem;
+  font-weight: 500;
+  color: #4a90e2;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}	  
+	  
+.pulse-text {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  color: #4a90e2;
+  animation: fadeInOut 6s infinite;
+}
+
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+.breath-circle {
+  width: 100px;
+  height: 100px;
+  margin: 2rem auto 1.5rem auto;
+  border-radius: 50%;
+  background: #2acfcf;
+  opacity: 0.8;
+  transform: scale(1); /* ← explicitly start small */
+  transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+}
+
+.log-button {
+  background: none;
+  border: none;
+  color: #4a90e2;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0.75rem;
+  font-size: 1rem;
+}
+
+
+/* Soft secondary action button */
+.button-secondary {
+  display: block;
+  width: 100%;
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #8ab2f2;
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.button-secondary:hover {
+  background: #7aa0d6;
+}
+
+/* Link-style text for subtle actions like sound toggle */
+.button-link {
+  background: none;
+  border: none;
+  color: #4a90e2;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0.75rem;
+  font-size: 1rem;
+}
+
+.button-muted-small {
+  width: 100%;
+  margin-top: 1rem;
+  padding: 1rem 1rem;
+  background: #2acfcf;
+  color: white;
+  font-weight: 600;
+	font-size: 1.3rem;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.button-muted-small:hover {
+  background: #21b3b3;
+}
+
+
+#toast {
+  visibility: hidden;
+  min-width: 250px;
+  max-width: 90%;
+  background-color: #4a90e2;
+  color: #fff;
+  text-align: center;
+  border-radius: 12px;
+  padding: 1rem;
+  position: fixed;
+  bottom: 5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  font-size: 1rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  opacity: 0;
+  transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+
+#toast.show {
+  visibility: visible;
+  opacity: 1;
+}
+	  
+	  
+  </style>
+</head>
+<body>
+
+<audio id="soothingAudio" loop preload="auto">
+  <source src="https://www.dropbox.com/scl/fi/ktv8w86j2ntdnfenx23ul/803421__universfield__tranquil-forest-melody-30s.mp3?rlkey=8c9r7yg4bo5u9zzywzu2gnceh&raw=1" type="audio/mpeg">
+  Your browser does not support the audio element.
+</audio>
+
+
+	
+<div class="card">
+  <div class="voice-checkin">
+    <p class="app-title">Who’s talking right now?</p>
+<div class="toggle-buttons">
+  <button type="button" class="voice-button active" data-voice="Steve">
+    Steve<br><small class="voice-label">Fear</small>
+  </button>
+  <button type="button" class="voice-button" data-voice="Theo">
+    Theo<br><small class="voice-label">Logic</small>
+  </button>
+  <button type="button" class="voice-button" data-voice="Unknown">
+    No idea<br><small class="voice-label">Help me</small>
+  </button>
+</div>
+
+  </div>
+  <input type="hidden" id="selectedVoice" value="Steve">
+
+  <textarea id="thought" placeholder="Describe the thought you're having:..."></textarea>
+  <button class="button" onclick="reflectWithTheo()">Reflect with Theo</button>
+	<button class="button" style="background-color: #2acfcf;" onclick="triggerEmergency()">Calm Space</button>
+	
+  <button class="log-button" onclick="showLog()">View Past Sessions</button>
+  <div class="response" id="theoResponse" style="display:none"></div>
+<div id="challengeSection" style="display: none; margin-top: 1rem;">
+  <button class="button-secondary" onclick="showChallengeBox()">Still not sure? Challenge Theo</button>
+</div>
+
+<div id="challengeBox" style="display: none; margin-top: 1rem;">
+  <label for="challengeInput">What part of Theo’s response didn’t land for you?</label>
+  <textarea id="challengeInput" placeholder="Write your follow-up thought..." style="width:100%; height:80px; padding:0.8rem; border-radius:10px; margin-top:0.5rem;"></textarea>
+  <button class="button" onclick="submitTheoChallenge()">Continue the conversation</button>
+</div>
+
+<button class="log-button" onclick="resetSession()" style="margin-top: 1.5rem;">Start a New Session</button>
+	
+<div id="toast"></div>	
+</div>
+
+<div id="sessionLog" class="session-log" style="display: none; max-width: 500px; margin: 2rem auto;"><h2>Your Past Reflections</h2><div id="logList"></div></div>
+
+<div id="questionnaireModal">
+  <div class="modal-inner">
+    <h2>Let’s figure it out together</h2>
+    <p>Answer these quick questions to help identify the voice:</p>
+
+    <div>
+      <label>Does this thought feel urgent or threatening?</label>
+      <select id="q1">
+        <option value="">Select...</option>
+        <option value="Steve">Yes</option>
+        <option value="Theo">No</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Is the thought kind and constructive?</label>
+      <select id="q2">
+        <option value="">Select...</option>
+        <option value="Theo">Yes</option>
+        <option value="Steve">No</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Would you say this to someone you love?</label>
+      <select id="q3">
+        <option value="">Select...</option>
+        <option value="Theo">Yes</option>
+        <option value="Steve">No</option>
+      </select>
+    </div>
+
+    <button class="button" onclick="submitQuestionnaire()">Continue</button>
+    <button class="hide-log" onclick="closeQuestionnaire()">Cancel</button>
+  </div>
+</div>
+
+<div id="emergencyModal" style="display: none;">
+  <div class="emergency-overlay">
+    <div class="emergency-content">
+  <h2>Breathe with me</h2>
+<div id="breathDisplay">
+  <span id="phaseInhale">Inhale...</span> 
+  <span id="phaseHold">Hold...</span> 
+  <span id="phaseExhale">Exhale...</span>
+</div>
+	
+		
+
+		<div class="breath-circle" style="transform: scale(1); opacity: 0.8;"></div>
+
+		<button class="button-link" onclick="toggleAudio()">Add Background Calm</button>
+
+
+
+		
+      <button class="button" onclick="closeEmergency()">I feel calmer now</button>
+	  <button class="button-secondary" onclick="startGrounding()">Still not calm? Try this...</button>
+
+
+
+	
+	<p id="theoWhisper" style="display: none; font-style: italic; color: #555; margin-top: 1rem;">
+  Theo: “You’re doing brilliantly. The storm is passing.”
+</p>
+	
+    </div>
+  </div>
+</div>
+	
+<div id="groundingModal" style="display: none;">
+  <div class="emergency-overlay">
+    <div class="emergency-content">
+      <h2>5-4-3-2-1 Grounding</h2>
+      <p id="groundingStep" style="font-size: 1.2rem; color: #2b2d42; margin-bottom: 1rem;"></p>
+      <button class="button" onclick="nextGroundingStep()">Next</button>
+      <button class="hide-log" onclick="closeGrounding()">Exit</button>
+    </div>
+  </div>
+</div>
+	
+<script>
+  async function reflectWithTheo() {
+    const input = document.getElementById('thought').value.trim();
+    const responseBox = document.getElementById('theoResponse');
+    const voice = document.getElementById('selectedVoice').value;
+
+    if (!input) return;
+
+    responseBox.style.display = 'block';
+    responseBox.innerHTML = 'Thinking with Theo...';
+
+    const logs = JSON.parse(localStorage.getItem('mindCouncilLogs') || '[]');
+    logs.push({ timestamp: new Date().toISOString(), thought: input, voice });
+    localStorage.setItem('mindCouncilLogs', JSON.stringify(logs));
+
+let systemPrompt = `You are Theo, a calm, rational, emotionally intelligent inner voice who helps the user (Jonathan) manage anxiety — especially health anxiety — using grounded reasoning, facts, and empathy.
+
+Jonathan is thoughtful, analytical, and deeply values honesty, logic, and factual reassurance. You must speak to him as if you are *his own internal compass*, not a chatbot.
+
+Your replies must always include:
+- At least **one grounded fact** (e.g. medical/statistical/technical)
+- At least **one pattern memory** (e.g. “this happened before and passed”)
+- At least **one practical grounding tool** (e.g. breathwork, reframing, time delay)
+- If Jonathan is panicking or overwhelmed, remind him he can open the “Calm Space” tool for guided breathwork and grounding.
+
+
+Tone:
+- Steady, warm, intelligent — not robotic or over-therapeutic
+- Never vague. Never default to “go see a doctor” unless red flag symptoms are described
+- End each message with a sense of calm or gentle anchoring
+
+You are not giving generic support. You are Theo — built from Jonathan’s inner wisdom. Every message you send should help him feel safer *and* smarter.`;
+
+// Dynamic prompt for user input
+let userPrompt = `Here's what I'm thinking: ${input}`;
+
+if (voice === "Steve") {
+  userPrompt = `Steve (Jonathan’s fear voice) is saying: \"${input}\". Please respond as Theo — offer a calm, factual, validating, and grounding reply. You must include: a real-world fact, a past pattern, and a practical calming suggestion. Keep your tone steady and kind, but always intelligent.`;
+}
+
+
+
+
+    const res = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer YOUR_API_KEY_HERE"
+      },
+      body: JSON.stringify({
+        model: "gpt-3.5-turbo",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt }
+        ]
+      })
+    });
+
+    const data = await res.json();
+    const theoReply = data.choices?.[0]?.message?.content || "Sorry, something went wrong.";
+
+    responseBox.innerHTML = `<div style="font-weight:600; font-size: 1.05rem; margin-bottom: 0.5rem;">Theo says:</div><div>${theoReply}</div>`;
+
+enableChallengeTheo(theoReply);
+
+
+  }
+
+function showLog() {
+  const logs = JSON.parse(localStorage.getItem('mindCouncilLogs') || '[]');
+  const logList = document.getElementById('logList');
+  const logContainer = document.getElementById('sessionLog');
+
+  if (logs.length === 0) {
+    logList.innerHTML = "<p>No reflections yet.</p>";
+  } else {
+    logList.innerHTML = logs.slice(-10).reverse().map(log => {
+      const date = new Date(log.timestamp).toLocaleString();
+      return `
+        <div style="margin-bottom: 1rem;">
+          <p><strong>${log.voice} said:</strong> ${log.thought}</p>
+          <p style="font-size: 0.85rem; color: #666;">${date}</p>
+        </div>
+      `;
+    }).join('');
+  }
+
+  logList.innerHTML += `<button class="hide-log" onclick="hideLog()">Hide Past Sessions</button>`;
+  logContainer.style.display = 'block';
+}
+
+function hideLog() {
+  document.getElementById('sessionLog').style.display = 'none';
+}
+
+
+document.querySelectorAll(".voice-button").forEach(button => {
+  button.addEventListener("click", () => {
+    const voice = button.dataset.voice;
+
+    if (voice === "Unknown") {
+      document.getElementById("questionnaireModal").style.display = 'block';
+      return;
+    }
+
+    document.getElementById("selectedVoice").value = voice;
+    document.querySelectorAll(".voice-button").forEach(b => b.classList.remove("active"));
+    button.classList.add("active");
+  });
+});
+
+	
+function closeQuestionnaire() {
+  document.getElementById('questionnaireModal').style.display = 'none';
+}
+
+function submitQuestionnaire() {
+  const answers = [document.getElementById('q1').value, document.getElementById('q2').value, document.getElementById('q3').value];
+  if (answers.includes("")) {
+    alert("Please answer all questions.");
+    return;
+  }
+
+  const score = answers.reduce((acc, val) => {
+    if (val === "Steve") acc.steve++;
+    else if (val === "Theo") acc.theo++;
+    return acc;
+  }, { steve: 0, theo: 0 });
+
+  let selected = score.steve > score.theo ? "Steve" : "Theo";
+  document.getElementById("selectedVoice").value = selected;
+
+  // Update buttons visually
+  document.querySelectorAll(".voice-button").forEach(b => b.classList.remove("active"));
+  document.querySelector(`.voice-button[data-voice="${selected}"]`).classList.add("active");
+
+  closeQuestionnaire();
+
+  // Optional: toast or alert to say what's been selected
+ showToast(`Looks like it's more of a ${selected} thought. Let's explore that.`, selected);
+
+
+}
+
+
+
+function closeEmergency() {
+  document.getElementById("emergencyModal").style.display = "none";
+}
+
+let breathPhases = [
+  { text: "Inhale...", duration: 4000 },
+  { text: "Hold...", duration: 3000 }, // shorter hold
+  { text: "Exhale...", duration: 7000 }
+];
+let breathIndex = 0;
+let breathTimeout;
+let theoTimeout;
+
+function triggerEmergency() {
+  document.getElementById("emergencyModal").style.display = "block";
+  document.getElementById("theoWhisper").style.display = "none";
+
+
+  breathIndex = 0;
+
+  const circle = document.querySelector(".breath-circle");
+  if (circle) {
+    circle.style.transform = "scale(1)";
+    circle.style.opacity = "0.8";
+  }
+
+  setTimeout(() => {
+    startBreathing();
+  }, 100); // 👈 gives browser a moment to visually reset
+
+  theoTimeout = setTimeout(() => {
+    document.getElementById("theoWhisper").style.display = "block";
+  }, 30000);
+}
+
+
+
+
+	
+function updateBreathCircle(phase) {
+  const circle = document.querySelector(".breath-circle");
+  if (!circle) return;
+  const duration = phase.duration;
+  circle.style.transition = `transform ${duration}ms ease-in-out, opacity ${duration}ms ease-in-out`;
+
+  switch (phase.text) {
+    case "Inhale...":
+      circle.style.transform = "scale(1.5)";
+      circle.style.opacity = "1";
+      break;
+    case "Hold...":
+      circle.style.transform = "scale(1.5)";
+      circle.style.opacity = "0.7";
+      break;
+    case "Exhale...":
+      circle.style.transform = "scale(1)";
+      circle.style.opacity = "0.5";
+      break;
+    default:
+      circle.style.transform = "scale(1)";
+      circle.style.opacity = "0.8";
+  }
+}
+
+function highlightBreathPhase(activePhase) {
+  const allPhases = ["Inhale...", "Hold...", "Exhale..."];
+  allPhases.forEach(phase => {
+    const el = document.getElementById(`phase${phase.replace("...", "")}`);
+    if (el) {
+      el.style.fontWeight = (phase === activePhase) ? "700" : "400";
+      el.style.color = (phase === activePhase) ? "#1d3557" : "#999";
+    }
+  });
+}
+	
+	
+function startBreathing() {
+  const phase = breathPhases[breathIndex];
+  highlightBreathPhase(phase.text);
+  updateBreathCircle(phase);
+
+  breathTimeout = setTimeout(() => {
+    breathIndex = (breathIndex + 1) % breathPhases.length;
+    startBreathing();
+  }, phase.duration);
+}
+
+
+
+function closeEmergency() {
+  document.getElementById("emergencyModal").style.display = "none";
+  pauseAudio();
+  resetSoundButton();
+  clearTimeout(breathTimeout);
+  clearTimeout(theoTimeout);
+  highlightBreathPhase(""); // Reset all highlights
+
+}
+
+
+
+function pauseAudio() {
+  const audio = document.getElementById("soothingAudio");
+  if (audio) {
+    audio.pause();
+    isAudioPlaying = false;
+    const btn = document.getElementById("toggleSoundBtn");
+    if (btn) btn.textContent = "Add Background Calm";
+  }
+}
+
+	
+
+
+
+let groundingSteps = [
+  "🖐 5 things you can see",
+  "🤚 4 things you can feel",
+  "👂 3 things you can hear",
+  "👃 2 things you can smell",
+  "👅 1 thing you can taste"
+];
+let groundingIndex = 0;
+
+function startGrounding() {
+  document.getElementById("emergencyModal").style.display = "none";
+  document.getElementById("groundingModal").style.display = "block";
+  pauseAudio();
+  resetSoundButton();
+  groundingIndex = 0;
+  document.getElementById("groundingStep").textContent = groundingSteps[groundingIndex];
+}
+
+function resetSoundButton() {
+  const btn = document.getElementById("playSoundBtn");
+  if (btn) {
+    btn.textContent = "Play Calming Sound";
+    btn.disabled = false;
+    btn.style.opacity = "1";
+  }
+}	
+	
+function nextGroundingStep() {
+  groundingIndex++;
+  if (groundingIndex < groundingSteps.length) {
+    document.getElementById("groundingStep").textContent = groundingSteps[groundingIndex];
+  } else {
+    document.getElementById("groundingStep").textContent = "Well done. You’re doing great.";
+    document.querySelector("#groundingModal .button").style.display = "none";
+  }
+}
+
+function closeGrounding() {
+  document.getElementById("groundingModal").style.display = "none";
+  document.querySelector("#groundingModal .button").style.display = "inline-block";
+}
+	
+let isAudioPlaying = false;
+
+function toggleAudio() {
+  const audio = document.getElementById("soothingAudio");
+  const btn = document.getElementById("toggleSoundBtn");
+
+  if (!audio) return;
+
+  if (!isAudioPlaying) {
+    audio.volume = 0.5;
+    audio.play().then(() => {
+      btn.textContent = "Pause Background Calm";
+      isAudioPlaying = true;
+    });
+  } else {
+    audio.pause();
+    btn.textContent = "Add Background Calm";
+    isAudioPlaying = false;
+  }
+}
+	
+</script>
+
+<script>
+let lastTheoResponse = ""; // Store the previous response
+
+// Call this after Theo responds
+function enableChallengeTheo(responseText) {
+  lastTheoResponse = responseText;
+  document.getElementById("challengeSection").style.display = "block";
+}
+
+function showChallengeBox() {
+  document.getElementById("challengeBox").style.display = "block";
+}
+
+async function submitTheoChallenge() {
+  const userChallenge = document.getElementById("challengeInput").value.trim();
+  if (!userChallenge) return;
+
+  const input = document.getElementById('thought').value.trim();
+  const responseBox = document.getElementById('theoResponse');
+
+  responseBox.innerHTML = 'Theo is thinking...';
+
+  const systemPrompt = `You are Theo, the user’s inner rational voice. You gave a previous response trying to help Jonathan calm an anxious thought. He’s now pushing back or questioning it. Your job is to stay calm, kind, and fact-based — and keep helping him explore the fear with compassion and curiosity.
+
+You must:
+- Respect his challenge without getting defensive
+- Validate that not every logical answer "lands"
+- Gently reframe or offer new insights
+- Use pattern memory and deeper questioning if needed
+
+Be steady. Be honest. Help him dig into the *root* of the fear — not just keep circling it.`;
+
+  const userPrompt = `Jonathan originally thought: "${input}"
+Theo replied: "${lastTheoResponse}"
+Jonathan now says: "${userChallenge}"
+
+Continue the conversation as Theo.`;
+
+  const res = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer YOUR_API_KEY_HERE"
+    },
+    body: JSON.stringify({
+      model: "gpt-3.5-turbo",
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt }
+      ]
+    })
+  });
+
+  const data = await res.json();
+  const theoReply = data.choices?.[0]?.message?.content || "Sorry, something went wrong.";
+
+  responseBox.innerHTML = `<strong>Theo says:</strong><br>${theoReply}`;
+  document.getElementById("challengeBox").style.display = "none";
+}
+
+function resetSession() {
+  document.getElementById("thought").value = "";
+  document.getElementById("theoResponse").style.display = "none";
+  document.getElementById("challengeSection").style.display = "none";
+  document.getElementById("challengeBox").style.display = "none";
+  document.getElementById("challengeInput").value = "";
+
+  // Reset voice to Steve
+  document.getElementById("selectedVoice").value = "Steve";
+  document.querySelectorAll(".voice-button").forEach(b => b.classList.remove("active"));
+  document.querySelector(`.voice-button[data-voice="Steve"]`).classList.add("active");
+
+  // Focus the input box
+  document.getElementById("thought").focus();
+}
+
+function showToast(message, voice = "Theo") {
+  const toast = document.getElementById("toast");
+  toast.textContent = message;
+
+  toast.style.backgroundColor = voice === "Steve" ? "#ff7aa2" : "#2acfcf";
+  toast.style.color = "#fff";
+
+  toast.className = "show";
+  setTimeout(() => {
+    toast.className = toast.className.replace("show", "");
+  }, 3000);
+}
+
+
+</script>	
+	
+
+</body>
+</html>
